@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trademark Identification and Analysis Engine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+            margin: 0;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .button-container {
+            width: 100%;
+            position: fixed;
+            bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .upload-box {
+            width: 180px;
+            height: 80px;
+            border: 2px dashed #007bff;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background-color: white;
+            cursor: pointer;
+            font-size: 14px;
+            color: #007bff;
+        }
+
+        .upload-box:hover {
+            background-color: #e7f1ff;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Trademark Identification and Analysis Engine</h1>
+
+    <div class="button-container">
+        <div class="upload-box" id="upload1">
+            <p>Drag & Drop or <label for="fileInput1" style="cursor: pointer; color: #007bff;">Upload</label></p>
+            <input type="file" id="fileInput1">
+        </div>
+
+        <div class="upload-box" id="upload2">
+            <p>Drag & Drop or <label for="fileInput2" style="cursor: pointer; color: #007bff;">Upload</label></p>
+            <input type="file" id="fileInput2">
+        </div>
+    </div>
+
+    <script>
+        function setupDragAndDrop(uploadBoxId, fileInputId) {
+            const uploadBox = document.getElementById(uploadBoxId);
+            const fileInput = document.getElementById(fileInputId);
+
+            // Click to open file picker
+            uploadBox.addEventListener('click', () => fileInput.click());
+
+            // Drag & Drop functionality
+            uploadBox.addEventListener('dragover', (event) => {
+                event.preventDefault();
+                uploadBox.style.borderColor = "#0056b3";
+            });
+
+            uploadBox.addEventListener('dragleave', () => {
+                uploadBox.style.borderColor = "#007bff";
+            });
+
+            uploadBox.addEventListener('drop', (event) => {
+                event.preventDefault();
+                uploadBox.style.borderColor = "#007bff";
+
+                if (event.dataTransfer.files.length > 0) {
+                    fileInput.files = event.dataTransfer.files;
+                    alert(`Selected: ${fileInput.files[0].name}`);
+                }
+            });
+
+            fileInput.addEventListener('change', function () {
+                if (fileInput.files.length > 0) {
+                    alert(`Selected: ${fileInput.files[0].name}`);
+                }
+            });
+        }
+
+        setupDragAndDrop("upload1", "fileInput1");
+        setupDragAndDrop("upload2", "fileInput2");
+    </script>
+
+</body>
+</html>
