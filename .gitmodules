@@ -1,0 +1,6 @@
+[submodule "Trademark-Identification-Back"]
+	path = Trademark-Identification-Back
+	url = https://github.com/logan-taggart/Trademark-Identification-Back
+[submodule "Trademark-Identification-Front"]
+	path = Trademark-Identification-Front
+	url = https://github.com/logan-taggart/Trademark-Identification-Front
