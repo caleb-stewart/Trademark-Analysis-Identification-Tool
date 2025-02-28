@@ -1,4 +1,4 @@
-# Trademark Identification and Analysis Engine
+# Trademark Analysis and Identification Tool
 ## Our senior project team consists of Lane Keck, Caleb Stewart, and Logan Taggart.
 ## Description
 A website where a user shall upload a logo of their choice to be detected and an image for a logo to be detected. The backend python program will detect and draw a shape around the logo. If the user decides to upload 
