@@ -1,0 +1,1 @@
+video_progress = {"progress_percentage": 0, "total_frames": 0}

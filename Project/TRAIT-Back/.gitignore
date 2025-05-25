@@ -1,0 +1,15 @@
+dist/
+build/
+*.spec
+
+.DS_Store
+
+__pycache__/
+*.pyc
+*.pyo
+
+/venv
+
+.env
+
+model_cache/
