@@ -1,12 +1,74 @@
-# Trademark Analysis and Identification Tool
-## Our senior project team consists of Lane Keck, Caleb Stewart, and Logan Taggart.
-## Description
-A website where a user shall upload a logo of their choice to be detected and an image for a logo to be detected. The backend python program will detect and draw a shape around the logo. If the user decides to upload 
-a video, the program will return timestamp of when the logo was detected as well as how long the logo was shown in the video.
+# TRAIT - Logo Detection System 🎯
 
-[TRAIT Backend Repository](https://github.com/logan-taggart/TRAIT-Back)  
-[TRAIT Frontend Repository](https://github.com/logan-taggart/TRAIT-Front)
-### Core elements
--Yolo (You only look once): A machine learning model specifically used for object detection <br>
--Pytorch: A machine learning framework <br>
--Flask: Web framework for python allowing us to make our script an API. <br>
+Complete full-stack application for AI-powered logo detection in images and videos.
+
+## 🚀 Quick Start
+
+### Installation & Running
+1. **Clone the repository:**
+```bash
+git clone https://github.com/caleb-stewart/Trademark-Analysis-Identification-Tool.git
+cd TRAIT
+```
+
+2. **Start Backend (Port 5174):**
+```bash
+cd TRAIT-Back
+pip install -r requirements.txt
+python3 run.py
+```
+
+3. **Start Frontend (Port 5173):**
+```bash
+cd TRAIT-Front
+npm install
+npm run start
+```
+
+4. **Access the application at:** `http://localhost:5173` or on the desktop using Electron
+
+## 📋 What is TRAIT?
+TRAIT is an AI-powered logo detection system that can identify and locate logos in both images and videos using YOLOv8 computer vision technology.
+
+### ✨ Features
+- **Image Logo Detection** - Upload images and detect all or specific logos
+- **Video Logo Detection** - Process videos with real-time progress tracking
+- **Interactive Desktop/Web Interface** - User-friendly React frontend
+- **RESTful API** - Comprehensive backend API for all operations
+
+## 🏗️ Architecture
+- **Frontend:** React application (Port 5173)
+- **Backend:** Python Flask API (Port 5174)
+- **AI Model:** YOLOv8 for logo detection
+- **Libraries:** Ultralytics, OpenCV, NumPy, Transformers, FAISS, etc.
+
+## 📁 Repository Structure
+```
+Trademark-Analysis-Identification-Tool/
+├── Documents/
+|      ├── Other/...
+|      ├── Presentations/...
+|      └── Sprint Reports/...
+├── Misc/
+|      ├── .ipynb_checkpoints/...
+|      ├── YOLO Model/...
+|      ├── test_scripts/...
+|      └── index.html
+├── Project/
+|      ├── TRAIT-Back/...
+|      ├── TRAIT-Front/...
+├── .gitignore
+└── README.md
+```
+
+## 🔗 Individual Repositories
+- **Frontend Only:** [TRAIT-Front](https://github.com/logan-taggart/TRAIT-Front)
+- **Backend Only:** [TRAIT-Back](https://github.com/logan-taggart/TRAIT-Back)
+
+## 👥 Team
+**Authors:** Logan Taggart, Caleb Stewart, Lane Keck  
+**Project:** Senior Capstone Project
+
+---
+*TRAIT - Trademark Analysis and Identification Tool*  
+*Updated June 1st, 2025*
