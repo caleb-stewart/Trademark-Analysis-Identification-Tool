@@ -1,0 +1,147 @@
+name: Build and Release Executables
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [macos-13, windows-latest]
+    
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          
+          # Install PyTorch CPU version first (consistent OpenMP)
+          pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cpu
+          
+          # Install numpy/scipy with consistent BLAS
+          pip install numpy==1.26.4 scipy==1.15.2
+          
+          # Install remaining requirements
+          pip install -r requirements.txt
+          
+          # Install PyInstaller
+          pip install pyinstaller
+        env:
+          KMP_DUPLICATE_LIB_OK: TRUE
+          OPENBLAS_NUM_THREADS: 1
+          MKL_NUM_THREADS: 1
+      
+      - name: Build executable
+        run: |
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            pyinstaller --onedir --windowed --name backend run.py \
+              --add-data "models/logo_detection.pt;models" \
+              --exclude-module tkinter \
+              --exclude-module matplotlib.tests \
+              --exclude-module numpy.tests \
+              --exclude-module PIL.tests \
+              --noconfirm \
+              --clean
+          else
+            pyinstaller --onedir --windowed --name backend run.py \
+              --add-data "models/logo_detection.pt:models" \
+              --exclude-module tkinter \
+              --exclude-module matplotlib.tests \
+              --exclude-module numpy.tests \
+              --exclude-module PIL.tests \
+              --noconfirm \
+              --clean
+          fi
+        shell: bash
+        env:
+          KMP_DUPLICATE_LIB_OK: TRUE
+          OPENBLAS_NUM_THREADS: 1
+          MKL_NUM_THREADS: 1
+          PYTHONHASHSEED: 1
+      
+      
+      - name: Create release archive
+        run: |
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            cd dist
+            powershell -Command "Compress-Archive -Path backend -DestinationPath ../backend-windows-x64.zip -Force"
+            cd ..
+          else
+            cd dist
+            tar -czf ../backend-macos-x64.tar.gz backend/
+            cd ..
+          fi
+        shell: bash
+      
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-${{ runner.os }}-build
+          path: |
+            backend-windows-x64.zip
+            backend-macos-x64.tar.gz
+          retention-days: 5
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: success()
+    
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-files
+      
+      - name: Display downloaded files
+        run: |
+          echo "Downloaded files:"
+          find release-files -type f -name "*.zip" -o -name "*.tar.gz" | sort
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Release v${{ github.run_number }}"
+          tag_name: "v${{ github.run_number }}"
+          body: |
+            🚀 **Automated Release**
+            
+            **Build Info:**
+            - Commit: `${{ github.sha }}`
+            - Workflow: `${{ github.run_id }}`
+            - Date: ${{ github.event.head_commit.timestamp }}
+            
+            **Downloads:**
+            - `backend-windows-x64.zip` - Windows 64-bit executable
+            - `backend-macos-x64.tar.gz` - macOS Intel 64-bit executable
+            
+            **Usage:**
+            1. Download the appropriate file for your platform
+            2. Extract the archive
+            3. Run the `backend` executable
+          files: |
+            release-files/**/*.zip
+            release-files/**/*.tar.gz
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -128,18 +128,43 @@ def update_logo_in_faiss(faiss_index, embedding, logo_id_map, logo_appearance_co
     save_frame = False
     # Get the distance and index of the nearest neighbor
     D, I = faiss_index.search(np.array(embedding), k=1)
+
+    # Always add the embedding to FAISS (whether it's a duplicate or new)
+    faiss_index.add(embedding)
+    # Index of the newly added embedding
+    new_faiss_index = faiss_index.ntotal - 1  
+    
     # Check if the distance is less than the threshold (LOWER IS BETTER)
     if D[0][0] < threshold:
-
-        # Logo already exists, increase the count of appearances
-        assigned_id, save_frame = increase_logo_appearance_count(logo_appearance_counts, logo_id_map, I, I[0][0])
+        # Logo already exists - get the logo ID from the matched embedding
+        matched_faiss_index = I[0][0]
+        matched_logo_id = logo_id_map[matched_faiss_index]
+        
+        # Map the new FAISS index to the same logo ID as the matched one
+        logo_id_map[new_faiss_index] = matched_logo_id
+        
+        # Increase the count of appearances for this logo ID
+        logo_appearance_counts[matched_logo_id] += 1
+        
+        assigned_id = matched_logo_id
+        
+        # We've seen this logo before. Do not save the new frame
+        save_frame = False  
         
     else:
-        # New logo seen, add it to FAISS
-        assigned_id = add_logo_to_faiss(faiss_index, embedding, logo_id_map, len(logo_id_map))
-        # Set the number of times we seen this new logo to 1 (first appearance)
-        logo_appearance_counts[assigned_id] = 1
+        # New logo seen - create a new logo ID
+        new_logo_id = len(set(logo_id_map.values()))  # Get next unique logo ID
+        
+        # Map the new FAISS index to the new logo ID
+        logo_id_map[new_faiss_index] = new_logo_id
+        
+        # Set the number of times we've seen this new logo to 1 (first appearance)
+        logo_appearance_counts[new_logo_id] = 1
+        
+        assigned_id = new_logo_id
         save_frame = True
+
+    # Return the assigned logo ID and whether to save the frame
     return assigned_id, save_frame
 
 

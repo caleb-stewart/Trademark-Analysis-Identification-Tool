@@ -1,0 +1,98 @@
+name: Build and Package Electron App
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-electron:
+    strategy:
+      matrix:
+        os: [macos-13, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout Electron frontend
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Download backend (macOS)
+        if: matrix.os == 'macos-13'
+        shell: bash
+        run: |
+          echo "OS: macOS"
+          curl -L -o backend.zip https://github.com/logan-taggart/TRAIT-Back/releases/latest/download/backend-macintel.zip
+          unzip backend.zip -d temp-backend
+          rm -rf backend
+          cp -r temp-backend/backend backend
+          chmod +x backend/backend
+          rm -rf backend.zip temp-backend
+
+      - name: Download backend (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          Write-Output "OS: Windows"
+          Invoke-WebRequest -Uri "https://github.com/logan-taggart/TRAIT-Back/releases/latest/download/backend-windows.zip" -OutFile "backend.zip"
+          Expand-Archive -Path "backend.zip" -DestinationPath "temp-backend" -Force
+          Remove-Item -Recurse -Force backend -ErrorAction SilentlyContinue
+          Copy-Item -Path "temp-backend/backend" -Destination "backend" -Recurse -Force
+          Remove-Item backend.zip
+          Remove-Item -Recurse -Force temp-backend
+
+      - name: Build Electron app
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npm run build-all
+
+      - name: Zip build output (macOS)
+        if: matrix.os == 'macos-13'
+        run: zip -r TRAIT-macintel.zip dist
+
+      - name: Zip build output (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist\* -DestinationPath TRAIT-windows.zip
+
+      - name: Upload zipped build
+        uses: actions/upload-artifact@v4
+        with:
+          name: TRAIT-${{ matrix.os }}
+          path: |
+            TRAIT-*.zip
+
+  release:
+    name: Create GitHub Release
+    needs: build-electron
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: TRAIT-macos-13
+          path: artifacts/mac
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: TRAIT-windows-latest
+          path: artifacts/win
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.run_id }}
+          name: Release ${{ github.run_id }}
+          files: |
+            artifacts/mac/*.zip
+            artifacts/win/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

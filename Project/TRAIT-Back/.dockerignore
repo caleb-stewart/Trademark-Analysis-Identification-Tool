@@ -1,0 +1,31 @@
+# Build artifacts
+dist/
+build/
+*.spec
+
+# macOS system files
+.DS_Store
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments (local)
+venv/
+.venv/
+
+# Environment variables
+.env
+
+# Local cache or data directories
+model_cache/
+new_logo_frames/
+processed_videos/
+*.mp4
+
+# Git and editor stuff
+.git
+.gitignore
+.vscode/
+.idea/
