@@ -8,7 +8,8 @@ Complete full-stack application for AI-powered logo detection in images and vide
 1. **Clone the repository:**
 ```bash
 git clone https://github.com/caleb-stewart/Trademark-Analysis-Identification-Tool.git
-cd TRAIT
+cd Trademark-Analysis-Identification-Tool
+cd Project
 ```
 
 2. **Start Backend (Port 5174):**
@@ -20,7 +21,7 @@ python3 run.py
 
 3. **Start Frontend (Port 5173):**
 ```bash
-cd TRAIT-Front
+cd ../TRAIT-Front
 npm install
 npm run start
 ```
@@ -71,4 +72,4 @@ Trademark-Analysis-Identification-Tool/
 
 ---
 *TRAIT - Trademark Analysis and Identification Tool*  
-*Updated June 1st, 2025*
+*Updated June 7th, 2025*
